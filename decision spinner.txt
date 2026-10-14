@@ -1,0 +1,262 @@
+# Build Decision Spinner
+
+Build a complete, responsive web app called **Decision Spinner** using HTML, CSS, and vanilla JavaScript only.
+
+The app helps users make decisions by adding their own options or generating recommendations, spinning a wheel to select an option, eliminating unwanted choices, and saving interesting decision sessions.
+
+## 1. Technology
+
+- Use only HTML5, CSS3, and vanilla JavaScript.
+- Create `index.html`, `style.css`, and `script.js`.
+- Do not use frameworks, third-party wheel libraries, a backend, a database, or an external AI API.
+- Use browser `localStorage` for persistent saved sessions.
+- The app must run locally and deploy as a static website.
+
+## 2. Visual Design
+
+Create a polished, light-themed interface with a soft pastel aesthetic.
+
+**Required colors**
+- Background: `#F9F8FF`
+- Primary CTA: `#4532C0`
+- Main text: `#24213A`
+- Secondary text: `#77738F`
+- Borders: `#E8E4F5`
+- Cards and input surfaces: `#FFFFFF`
+
+**Pastel colors for decision options**
+- Blue: `#CDE4FF`
+- Lavender: `#DED5FF`
+- Pink: `#FFD8E5`
+- Peach: `#FFE2CC`
+- Yellow: `#FFF0B8`
+- Mint: `#CFF2E3`
+- Aqua: `#C9F0F1`
+- Lilac: `#EAD8FA`
+
+Use these pastel colors consistently for wheel segments, option chips, and suggested options. Use dark text for readability.
+
+Use rounded corners, subtle shadows, generous spacing, clear typography, and restrained animations. Avoid visual clutter.
+
+The interface must be responsive on mobile, tablet, and desktop.
+
+## 3. Layout and Copy
+
+Use a compact header with the app name, a simple wheel-inspired brand mark, and access to saved sessions.
+
+Display this tagline:
+
+**"Too many choices? Let's make one."**
+
+Use a two-column desktop layout:
+- Left: topic input, recommendation generation, and option management.
+- Right: decision wheel, spin button, and result.
+
+Stack the sections on mobile.
+
+Use concise, friendly copy throughout.
+
+## 4. Manual Option Entry
+
+Section heading: **What are your options?**
+
+Supporting text: "Add the choices you're deciding between."
+
+Include an input with the placeholder "Type an option..." and an **Add option** button.
+
+Users must be able to:
+- Add options by clicking the button or pressing Enter.
+- Remove individual options.
+- Clear all options.
+- Add up to 12 active options.
+- See each option as a pastel-colored chip.
+- Receive clear validation feedback.
+
+Trim whitespace, reject empty entries, and prevent case-insensitive duplicates. Update the wheel immediately when options change.
+
+Disable spinning when fewer than two options exist.
+
+## 5. Automatic Option Recommendations
+
+Section heading: **Need ideas?**
+
+Supporting text: "Tell us what you're deciding, and we'll suggest some options."
+
+Include a topic input with the placeholder:
+
+"What do you want to decide? e.g. What should I eat for lunch?"
+
+Add a **Generate options** button.
+
+Implement a local, rule-based recommendation engine in JavaScript. Do not use an external API or claim to use AI.
+
+Support at least these categories:
+- Food and meals
+- JavaScript projects
+- Productivity
+- Writing and content ideas
+- Entertainment
+- Weekend activities
+- Learning and skill development
+- General decisions
+
+Generate up to six relevant suggestions per request.
+
+Examples:
+
+- Lunch: Jollof rice, noodles and eggs, chicken sandwich, rice and stew, yam and egg sauce, beans and plantain.
+- JavaScript projects: Quiz app, expense tracker, countdown timer, notes app, memory matching game, color palette generator.
+- Writing: Lessons from a recent project, a design problem, something learned this week, a useful tool, a product improvement, a mistake that taught a lesson.
+
+For unknown topics, provide sensible fallback suggestions without pretending they are personalized.
+
+Display results under **Suggested options**. Use pastel-colored selectable chips or cards.
+
+Users must be able to select and deselect suggestions, add selected options to their existing list, and generate another set.
+
+Do not automatically add suggestions to the wheel. Prevent duplicates and enforce the 12-option limit. Explain when selected suggestions exceed the available slots.
+
+## 6. Interactive Decision Wheel
+
+Draw a large circular wheel using HTML Canvas or SVG.
+
+Requirements:
+- One equal-sized segment per active option.
+- Distinct pastel colors for segments.
+- Readable labels within segment boundaries.
+- A fixed pointer at the top.
+- A central hub.
+- Responsive sizing.
+- Immediate updates when options change.
+
+### Spin behavior
+
+When the user clicks **Spin the wheel**:
+
+1. Validate that at least two options exist.
+2. Prevent overlapping spins.
+3. Select a winner from the current options.
+4. Calculate the wheel rotation so the winning segment aligns with the fixed pointer.
+5. Animate several rotations with smooth deceleration.
+6. Reveal the winner after the animation completes.
+
+**The winning option must always match the segment beneath the pointer.** Do not select a winner independently of the final wheel position.
+
+Handle repeated spins, changing option counts, and rotation-angle calculations correctly.
+
+## 7. Results and Repeated Spins
+
+After each spin, display:
+
+**Your pick is...**
+
+Show the winner prominently and provide these actions:
+- **Spin again**
+- **Edit options**
+- **Save session**
+
+Spinning again must preserve the active options and record the new result. The same option may win more than once.
+
+Do not automatically remove the winner.
+
+Use lightweight celebration effects and respect reduced-motion preferences.
+
+## 8. Edit Options Through Elimination
+
+The **Edit options** action must allow users to review, add, and remove active options before returning to the wheel.
+
+Users can deliberately eliminate the previous winner or any other option.
+
+- Never remove a winner automatically.
+- Preserve the order of remaining options.
+- Update the wheel immediately.
+- Require at least two options to spin.
+- Preserve historical results when options are removed or changed.
+
+Keep active options separate from spin history. Removing an option must not erase its previous appearances in the history.
+
+## 9. Save and Manage Sessions
+
+Allow users to save interesting decision sessions using a **Save session** action.
+
+Each saved session must contain:
+- Unique session ID.
+- Editable title.
+- Original topic, if provided.
+- Active options.
+- Most recent winner.
+- Complete spin history, including winner text and timestamp.
+- Creation and last-updated timestamps.
+
+Use ISO 8601 timestamps.
+
+Provide a **Saved sessions** view with an empty state and session cards showing the title, topic, latest result, option count, spin count, and last-updated date.
+
+Each saved session must support:
+
+- **Resume:** Restore the saved options and history into the workspace.
+- **View details:** Inspect the saved session without modifying it.
+- **Edit:** Change the title and options.
+- **Duplicate:** Create an independent copy with a new ID.
+- **Delete:** Remove the session after confirmation.
+
+### Session integrity
+
+Resuming a session must not silently overwrite its saved version.
+
+Treat resumed sessions as working copies. Track unsaved changes and let users save, discard, or cancel when leaving a modified session.
+
+Update an existing saved session only after an explicit save action. Duplicated sessions must remain independent.
+
+Prevent accidental duplicate saves caused by repeated clicks.
+
+## 10. Persistent Storage
+
+Use `localStorage` with the versioned key:
+
+`decisionSpinner.sessions.v1`
+
+Requirements:
+- Load saved sessions when the app starts.
+- Store data as JSON.
+- Validate stored data before using it.
+- Preserve sessions across refreshes and browser restarts.
+- Handle missing, malformed, incompatible, or unavailable storage gracefully.
+- Handle storage quota errors and show useful feedback.
+- Never claim a session was saved if persistence failed.
+- Generate unique IDs rather than using titles as identifiers.
+- Do not overwrite saved sessions with unsaved working-copy changes.
+- Keep data local to the current browser and origin; do not promise cross-device synchronization.
+
+## 11. Code Quality and Accessibility
+
+Maintain a single source of truth for active options, current results, spin history, and saved sessions.
+
+Use small, clearly named functions for option management, recommendations, wheel rendering, spin calculations, session management, and storage.
+
+Use semantic HTML, accessible labels, keyboard navigation, visible focus indicators, sufficient contrast, and an accessible announcement for completed results.
+
+Respect `prefers-reduced-motion`.
+
+Handle empty inputs, duplicate options, long labels, rapid clicks, insufficient options, interrupted animations, and invalid stored data.
+
+## 12. Testing and Delivery
+
+Build the complete application, not a static mockup.
+
+Test:
+- Manual option entry and removal.
+- Recommendation generation and selection.
+- Duplicate prevention and the 12-option limit.
+- Wheel alignment across repeated spins and different option counts.
+- Elimination without corrupting spin history.
+- Saving, refreshing, resuming, editing, duplicating, and deleting sessions.
+- Unsaved-change protection.
+- Storage failures and malformed data.
+- Mobile responsiveness and reduced-motion behavior.
+
+Fix discovered errors before declaring the app complete.
+
+Deliver the three source files and a brief summary of the implemented features and any remaining limitations.
+
+**Build the complete working application now.**
