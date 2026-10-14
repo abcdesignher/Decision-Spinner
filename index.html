@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#F9F8FF">
+<meta name="description" content="Decision Spinner — add your options or get suggestions, spin the wheel, and let it pick for you.">
+<title>Decision Spinner</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23DED5FF' stroke='%234532C0' stroke-width='2'/%3E%3Cpath d='M16 16V2a14 14 0 0 1 14 14z' fill='%23CDE4FF'/%3E%3Cpath d='M16 16h14a14 14 0 0 1-14 14z' fill='%23FFD8E5'/%3E%3Cpath d='M16 16v14A14 14 0 0 1 2 16z' fill='%23FFF0B8'/%3E%3Cpath d='M16 16H2A14 14 0 0 1 16 2z' fill='%23CFF2E3'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%234532C0'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-mark" aria-hidden="true">
+      <svg width="30" height="30" viewBox="0 0 32 32" focusable="false">
+        <circle cx="16" cy="16" r="14" fill="#DED5FF" stroke="#4532C0" stroke-width="1.5"></circle>
+        <path d="M16 16V2a14 14 0 0 1 14 14z" fill="#CDE4FF"></path>
+        <path d="M16 16h14a14 14 0 0 1-14 14z" fill="#FFD8E5"></path>
+        <path d="M16 16v14A14 14 0 0 1 2 16z" fill="#FFF0B8"></path>
+        <path d="M16 16H2A14 14 0 0 1 16 2z" fill="#CFF2E3"></path>
+        <circle cx="16" cy="16" r="4" fill="#4532C0"></circle>
+        <path d="M16 -1 L12.5 5.5 L19.5 5.5 Z" fill="#4532C0"></path>
+      </svg>
+    </span>
+    <span class="brand-name">Decision Spinner</span>
+  </div>
+  <div class="header-actions">
+    <button type="button" class="btn btn-ghost" id="newDecisionBtn">New decision</button>
+    <button type="button" class="btn btn-secondary" id="openSessionsBtn">
+      Saved sessions <span class="badge" id="sessionCount">0</span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+  <p class="tagline">Too many choices? Let&rsquo;s make one.</p>
+
+  <div class="layout">
+    <div class="column">
+
+      <section class="card" aria-labelledby="ideasHeading">
+        <h2 id="ideasHeading">Need ideas?</h2>
+        <p class="support">Tell us what you&rsquo;re deciding, and we&rsquo;ll suggest some options.</p>
+        <form id="topicForm" class="row-form">
+          <label class="sr-only" for="topicInput">What do you want to decide?</label>
+          <input type="text" id="topicInput" maxlength="140" autocomplete="off"
+                 placeholder="What do you want to decide? e.g. What should I eat for lunch?">
+          <button type="submit" class="btn btn-primary">Generate options</button>
+        </form>
+
+        <div id="suggestionsArea" hidden>
+          <h3 class="subheading">Suggested options</h3>
+          <ul class="chips" id="suggestionList"></ul>
+          <div class="btn-row">
+            <button type="button" class="btn btn-primary" id="addSelectedBtn">Add selected</button>
+            <button type="button" class="btn btn-secondary" id="regenerateBtn">Generate another set</button>
+          </div>
+          <p class="feedback" id="suggestionNote" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="optionsHeading">
+        <h2 id="optionsHeading">What are your options?</h2>
+        <p class="support">Add the choices you&rsquo;re deciding between.</p>
+        <form id="optionForm" class="row-form">
+          <label class="sr-only" for="optionInput">Type an option</label>
+          <input type="text" id="optionInput" maxlength="80" autocomplete="off" placeholder="Type an option...">
+          <button type="submit" class="btn btn-primary">Add option</button>
+        </form>
+        <p class="feedback" id="optionFeedback" role="status" aria-live="polite"></p>
+        <ul class="chips chips-editable" id="optionList"></ul>
+        <div class="card-footer">
+          <span class="muted" id="optionCount">0 / 12 options</span>
+          <button type="button" class="btn btn-ghost btn-sm" id="clearOptionsBtn" disabled>Clear all</button>
+        </div>
+      </section>
+
+    </div>
+
+    <div class="column">
+
+      <section class="card wheel-card" aria-labelledby="wheelHeading">
+        <h2 id="wheelHeading">Spin to decide</h2>
+        <div class="wheel-wrap">
+          <canvas id="wheelCanvas" role="img" aria-label="Decision wheel, no options yet"></canvas>
+        </div>
+        <button type="button" class="btn btn-primary btn-block btn-big" id="spinBtn" disabled>Spin the wheel</button>
+        <p class="hint" id="spinHint">Add at least two options to spin.</p>
+      </section>
+
+      <section class="card result-card" id="resultCard" hidden aria-labelledby="resultHeading">
+        <div class="confetti-layer" id="confettiLayer" aria-hidden="true"></div>
+        <h2 class="eyebrow" id="resultHeading">Your pick is&hellip;</h2>
+        <p class="winner" id="winnerText"></p>
+        <div class="result-actions">
+          <button type="button" class="btn btn-primary" id="spinAgainBtn">Spin again</button>
+          <button type="button" class="btn btn-secondary" id="editOptionsBtn">Edit options</button>
+          <button type="button" class="btn btn-secondary" id="saveSessionBtn">Save session</button>
+        </div>
+        <div class="history-block" id="historyBlock" hidden>
+          <h3 class="subheading">Spin history</h3>
+          <ol class="history-list" id="historyList"></ol>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <p class="footnote">Everything stays in this browser &mdash; no account, no sync.</p>
+</main>
+
+<div class="overlay" id="overlay" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-head">
+      <h2 id="modalTitle"></h2>
+      <button type="button" class="icon-btn" id="modalCloseBtn" aria-label="Close dialog">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+<div class="sr-only" id="announcer" role="status" aria-live="polite"></div>
+
+<noscript><p style="padding:24px;text-align:center">Decision Spinner needs JavaScript to run.</p></noscript>
+
+<script src="script.js"></script>
+</body>
+</html>
